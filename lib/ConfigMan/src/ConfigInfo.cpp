@@ -4,40 +4,39 @@
 #include <stdlib.h>
 #include "pinDataType.h"
 
-ConfigInfo::ConfigInfo(uint16_t vertime16, uint16_t verdate16, uint8_t vermajor, uint8_t verminor, const char *devicename_P)
+ConfigInfo::ConfigInfo(uint8_t pincount, uint16_t vertime16, uint16_t verdate16, uint8_t vermajor, uint8_t verminor, const char *devicename_P)
 {
     verTime16 = vertime16;
     verDate16 = verdate16;
     verMajor = vermajor;
     verMinor = verminor;
     deviceName_P = devicename_P;
-};
 
-void ConfigInfo::init(uint8_t count)
-{
-    if (initialized)
-    {
-        Serial.println(F("ConfigInfo::init(uint8_t) can only be invoked once! Halting."));
-        while (true)
-        {
-        }
-    }
-
-    pinCount = count;
-    pins = (PinInfo *)malloc(sizeof(PinInfo) * count);
+    pinCount = pincount;
+    pins = (PinInfo *)malloc(sizeof(PinInfo) * pinCount);
     pinIndexToAdd = 0;
     initialized = true;
-    Serial.print(F("ConfigInfo::init FieldCount je: "));
-    Serial.println(pinCount, DEC);
-}
+};
 
-uint8_t ConfigInfo::getPinCount()
-{
-    if (initialized)
-        return pinCount;
-    else
-        return 0;
-}
+// void ConfigInfo::init(uint8_t count)
+// {
+//     if (initialized)
+//     {
+//         Serial.println(F("ConfigInfo::init(uint8_t) can only be invoked once! Halting."));
+//         while (true)
+//         {
+//         }
+//     }
+
+//     pinCount = count;
+//     pins = (PinInfo *)malloc(sizeof(PinInfo) * count);
+//     pinIndexToAdd = 0;
+//     initialized = true;
+//     Serial.print(F("ConfigInfo::init FieldCount je: "));
+//     Serial.println(pinCount, DEC);
+// }
+
+
 
 bool ConfigInfo::addPin(uint8_t pinId, const char *name, void *valueVar, void *oldValueVar, PinDataType dataType, uint8_t maxLength, PinMode pinMode, PinChangedCallback callback)
 {
@@ -91,11 +90,7 @@ void *ConfigInfo::getValue(int pinId)
     }
 }
 
-bool ConfigInfo::setValue(int pinId, void *value)
-{
-    PinInfo *pi = getPinById(pinId);
-    return setValue(pi, value);
-}
+
 
 bool ConfigInfo::setValue(PinInfo * pi, void *value)
 {
@@ -158,7 +153,7 @@ uint8_t ConfigInfo::pinIdToIndex(uint8_t pinId)
     return PINID_INVALID;
 }
 
-uint8_t ConfigInfo::processCommand(uint8_t *cmd, int8_t cmdlen, uint8_t *dest, uint8_t destlen)
+int ConfigInfo::processCommand(uint8_t *cmd, int8_t cmdlen, uint8_t *dest, uint8_t destlen)
 {
     switch ((char)cmd[0])
     {
@@ -181,7 +176,7 @@ uint8_t ConfigInfo::processCommand(uint8_t *cmd, int8_t cmdlen, uint8_t *dest, u
     return 0;
 }
 
-uint8_t ConfigInfo::processInfo(uint8_t *message, uint8_t msglen, uint8_t *buffer, uint8_t buflen)
+int ConfigInfo::processInfo(uint8_t *message, uint8_t msglen, uint8_t *buffer, uint8_t buflen)
 {
     /* Ovaj metod podržava poziv bez parametara ili sa parametrima
      * Bez parametara vraća broj config polja kao bajt.
@@ -245,7 +240,7 @@ uint8_t ConfigInfo::processInfo(uint8_t *message, uint8_t msglen, uint8_t *buffe
     return packer.getPos(); // vrati dužinu celokupnog odgovora
 }
 
-uint8_t ConfigInfo::processQuery(uint8_t *message, uint8_t msglen, uint8_t *buffer, uint8_t buflen)
+int ConfigInfo::processQuery(uint8_t *message, uint8_t msglen, uint8_t *buffer, uint8_t buflen)
 {
     PinInfo *fld;
     uint8_t id;
@@ -335,7 +330,7 @@ uint8_t ConfigInfo::processQuery(uint8_t *message, uint8_t msglen, uint8_t *buff
     return packer.getPos(); // vrati dužinu odgovora
 }
 
-void ConfigInfo::processSet(uint8_t *buffer, uint8_t length)
+int ConfigInfo::processSet(uint8_t *buffer, uint8_t length)
 {
     uint8_t pinId;      // id pina u Set baferu
     uint8_t lenOut;     // dužina nove vrednosti u Set baferu
@@ -381,15 +376,16 @@ void ConfigInfo::processSet(uint8_t *buffer, uint8_t length)
             }
             parser.moveNext();
         }
+        return parser.getPos();     // vrati poziciju u baferu parsera nakon svih komandi kao indikaciju uspeha
     }
     else
     {
         //Serial.println(F("Prekidam ConfigInfo::processMessage"));
-        return;
+        return 0;
     }
 }
 
-uint8_t ConfigInfo::processVersion(uint8_t *message, uint8_t msglen, uint8_t *buffer, uint8_t buflen)
+int ConfigInfo::processVersion(uint8_t *message, uint8_t msglen, uint8_t *buffer, uint8_t buflen)
 {
     /* Vraća verziju softvera
      * Bez parametara vraća broj config polja kao bajt.
