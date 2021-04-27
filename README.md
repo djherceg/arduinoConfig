@@ -20,13 +20,13 @@ Currently supported platforms: Arduino framework on the following boards:
 
 # Example
 Let us demonstrate how the Configuration library is used. There are several steps:
-	* Include the library header files
-	* Declare state variables and their names
-	* Instantiate the ConfigInfo object
-	* Declare callback functions for pin value changes
-	* Register state variables as pins with the library
-	* Implement callbacks
-	* Call the processCommand method to process configuration commands
+  * Include the library header files
+  * Declare state variables and their names
+  * Instantiate the ConfigInfo object
+  * Declare callback functions for pin value changes
+  * Register state variables as pins with the library
+  * Implement callbacks
+  * Call the processCommand method to process configuration commands
 
 ## Include the library
 Include the library.
@@ -68,13 +68,13 @@ Declare callback functions which will be invoked by the library when a pin value
 ## Register pins
 
 Register state variables (Pins) with the ConfigInfo object and provide metadata for each pin.
-	- Pin ID
-	- Pin name (C string in PROGMEM for Uno, in RAM for ESP32)
-	- Pin variable for the current value
-	- Pin variable for the old value (optional)
-	- Pin data type
-	- Pin mode
-	- Pin change callback (function pointer)
+  - Pin ID
+  - Pin name (C string in PROGMEM for Uno, in RAM for ESP32)
+  - Pin variable for the current value
+  - Pin variable for the old value (optional)
+  - Pin data type
+  - Pin mode
+  - Pin change callback (function pointer)
 
 	  config.addPin(201, sw1name, &sw1, &sw1old, PinDataType::pdtBool, PinMode::pmOutput, pinCallback);
 	  config.addPin(202, count1name, &count1, &count1old, PinDataType::pdtInt16, PinMode::pmOutput, pinCallback);
