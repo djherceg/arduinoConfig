@@ -20,13 +20,13 @@ Currently supported platforms: Arduino framework on the following boards:
 
 # Example
 Let us demonstrate how the Configuration library is used. There are several steps:
-	- Include the library header files
-	- Declare state variables and their names
-	- Instantiate the ConfigInfo object
-	- Declare callback functions for pin value changes
-	- Register state variables as pins with the library
-	- Implement callbacks
-	- Call the processCommand method to process configuration commands
+	* Include the library header files
+	* Declare state variables and their names
+	* Instantiate the ConfigInfo object
+	* Declare callback functions for pin value changes
+	* Register state variables as pins with the library
+	* Implement callbacks
+	* Call the processCommand method to process configuration commands
 
 ## Include the library
 Include the library.
