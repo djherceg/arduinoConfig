@@ -68,20 +68,20 @@ Declare callback functions which will be invoked by the library when a pin value
 ## Register pins
 
 Register state variables (Pins) with the ConfigInfo object and provide metadata for each pin.
-  - Pin ID
-  - Pin name (C string in PROGMEM for Uno, in RAM for ESP32)
-  - Pin variable for the current value
-  - Pin variable for the old value (optional)
-  - Pin data type
-  - Pin mode
-  - Pin change callback (function pointer)
+  * Pin ID
+  * Pin name (C string in PROGMEM for Uno, in RAM for ESP32)
+  * Pin variable for the current value
+  * Pin variable for the old value (optional)
+  * Pin data type
+  * Pin mode
+  * Pin change callback (function pointer)
 
-	  config.addPin(201, sw1name, &sw1, &sw1old, PinDataType::pdtBool, PinMode::pmOutput, pinCallback);
-	  config.addPin(202, count1name, &count1, &count1old, PinDataType::pdtInt16, PinMode::pmOutput, pinCallback);
-	  config.addPin(203, rname, &r, &rold, PinDataType::pdtFloat, PinMode::pmOutput, pinCallback);
-	  config.addPin(204, lngname, &lng, &lngold, PinDataType::pdtUInt32, PinMode::pmOutput, pinCallback);
-	  config.addPin(205, text1name, text1, text1old, PinDataType::pdtString, PinMode::pmOutput, pinCallback);
-	  config.setEventHandler(callback);    // general 'onchange' handler for all pins
+	config.addPin(201, sw1name, &sw1, &sw1old, PinDataType::pdtBool, PinMode::pmOutput, pinCallback);
+	config.addPin(202, count1name, &count1, &count1old, PinDataType::pdtInt16, PinMode::pmOutput, pinCallback);
+	config.addPin(203, rname, &r, &rold, PinDataType::pdtFloat, PinMode::pmOutput, pinCallback);
+	config.addPin(204, lngname, &lng, &lngold, PinDataType::pdtUInt32, PinMode::pmOutput, pinCallback);
+	config.addPin(205, text1name, text1, text1old, PinDataType::pdtString, PinMode::pmOutput, pinCallback);
+	config.setEventHandler(callback);    // general 'onchange' handler for all pins
 	
 ## Implement callbacks
 
