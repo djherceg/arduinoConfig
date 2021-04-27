@@ -1,6 +1,6 @@
 #include "bytePacker.h"
 #include <string.h>
-#include "avr/pgmspace.h"
+//#include "avr/pgmspace.h"
 #include <Arduino.h>
 
 void BytePacker::init(uint8_t *buffer, uint8_t length)

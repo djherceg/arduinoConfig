@@ -4,7 +4,9 @@
 #include "stdint.h"
 #include "pindatatype.h"
 #include <string.h>
+#ifndef ENV_ESP32DEV
 #include <avr/pgmspace.h>
+#endif
 
 
 class PinInfo;

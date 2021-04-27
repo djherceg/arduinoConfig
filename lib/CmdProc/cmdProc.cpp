@@ -55,7 +55,7 @@ namespace CmdProc
     return true;
   }
 
-  bool tryParseInt(char *s, int &outResult, bool allowMinus = false)
+  bool tryParseInt(char *s, int &outResult, bool allowMinus)
   {
     int32_t i;
     bool res = tryParseInt32(s, i, allowMinus);
@@ -63,7 +63,7 @@ namespace CmdProc
     return res;
   }
 
-  bool tryParseInt32(char *s, int32_t &outResult, bool allowMinus = false)
+  bool tryParseInt32(char *s, int32_t &outResult, bool allowMinus)
   {
     int32_t r;
     //if ((!tryParseHex(s, outResult)) && (!tryParseDec(s, outResult, allowMinus)))
@@ -79,7 +79,7 @@ namespace CmdProc
     }
   }
 
-  bool tryParseDec(char *s, int &outResult, bool allowMinus = false)
+  bool tryParseDec(char *s, int &outResult, bool allowMinus)
   {
     int32_t i;
     bool res = tryParseDec32(s, i, allowMinus);
@@ -87,7 +87,7 @@ namespace CmdProc
     return res;
   }
 
-  bool tryParseDec32(char *s, int32_t &outResult, bool allowMinus = false)
+  bool tryParseDec32(char *s, int32_t &outResult, bool allowMinus)
   {
     outResult = 0;
     int n = strlen(s);

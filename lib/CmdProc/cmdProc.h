@@ -2,7 +2,9 @@
 #define __CMDPROCV1_H__
 
 #include <Arduino.h>
+#ifndef ENV_ESP32DEV
 #include <avr/pgmspace.h>
+#endif
 #include <string.h>
 
 #define CMD_ERR_GENERALERROR -1
@@ -81,7 +83,11 @@ namespace CmdProc
         //Serial.println("<");
         for (int j = 0; j < count; j++)
         {
+#ifdef ENV_ESP32DEV
+          if (strcmp(pch, commands[j].cmdName) == 0)
+#else
           if (strcmp_P(pch, commands[j].cmdName) == 0)
+#endif
           {
             int rez = 0;
             int mi = commands[j].GetMinTokens();
@@ -207,6 +213,6 @@ namespace CmdProc
   bool tryParseDate(char *s, int &outDay, int &outMonth, int &outYear);
   bool isValidDate(int dd, int mm, int yy);
 
-} // namespace SerKomProc
+} // namespace CmdProc
 
 #endif

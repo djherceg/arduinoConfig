@@ -1,4 +1,7 @@
 # arduinoConfig
+
+*last updated on 27.4.2021*
+
 The library maintains runtime configuration parameters (called Pins) which are stored in variables. Parameters are registered with metadata.
 
 Supported operations include:
@@ -9,7 +12,13 @@ Supported operations include:
 
 The library relies on the BytePacker library to pack and parse binary data.
 
-Example
+## Supported platforms
+
+Currently supported platforms: Arduino framework on the following boards:
+  * Arduino Uno
+  * ESP32
+
+# Example
 Let us demonstrate how the Configuration library is used. There are several steps:
 	- Include the library header files
 	- Declare state variables and their names
@@ -19,10 +28,12 @@ Let us demonstrate how the Configuration library is used. There are several step
 	- Implement callbacks
 	- Call the processCommand method to process configuration commands
 
+## Include the library
 Include the library.
 
 	#include <ConfigInfo.h>
 
+## Declare state variables
 Declare state variables and provide initial values. Pin names are kept in PROGMEM to reduce RAM usage.
 
 	bool sw1 = false;
@@ -41,16 +52,22 @@ Declare state variables and provide initial values. Pin names are kept in PROGME
 	const char lngname[] PROGMEM{"LongCounter"};
 	const char text1name[] PROGMEM{"Text1"};
 
+## Initialize the ConfigInfo
+
 Initialize the ConfigInfo object with the device name, manufacture date and time.
 
 	ConfigInfo config(toDate16(2020, 11, 25), toTime16(20, 12, 00), 1, 0, deviceName);
+
+## Declare callback functions
 
 Declare callback functions which will be invoked by the library when a pin value is changed.
 
 	void callback(PinInfo *cfi);    // forward declaration for the general callback
 	void pinCallback(PinInfo *cfi); // forward declaration for the individual pin callback
 
-Register state variables with the ConfigInfo object and provide metadata.
+## Register pins
+
+Register state variables (Pins) with the ConfigInfo object and provide metadata.
 	- Pin ID
 	- Pin name (in PROGMEM)
 	- Pin variable for the current value
@@ -67,12 +84,15 @@ Register state variables with the ConfigInfo object and provide metadata.
 	  config.addPin(205, text1name, text1, text1old, PinDataType::pdtString, PinMode::pmOutput, pinCallback);
 	  config.setEventHandler(callback);
 	
-Implement the callbacks.
+## Implement callbacks
+
+Implement callbacks for individual pins and one general callback for all pins.
 
 	void callback(PinInfo *pin)
 	{
 	  Serial.println(pin->id);
 	}
+
 	void pinCallback(PinInfo *cfi)
 	{
 	  Serial.println(cfi->id);
@@ -86,7 +106,8 @@ Implement the callbacks.
 
 Note the __FlashStringHelper cast by the name field. This is because name points to an address in program memory, and not in RAM.
 
-Processing incoming commands
+# Processing incoming commands
+
 To process incoming configuration commands, invoke the ConfigInfo::processCommand method.
 
 	    switch (sbuf.buffer[0])
@@ -112,7 +133,7 @@ To process incoming configuration commands, invoke the ConfigInfo::processComman
 	      break;
 	    }
 
-Printing PROGMEM strings
+# Printing PROGMEM strings
 A helper function to print C strings stored in PROGMEM. It copies the string to a temporary buffer in RAM, prints it, and finally deallocates the buffer. An alternative approach would be to read bytes in a loop directly from PROGMEM and send them to serial output.
 
 	void printStr_P(const char *p)

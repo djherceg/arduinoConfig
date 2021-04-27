@@ -2,7 +2,9 @@
 #include <ConfigInfo.h>
 #include "serialbuf.h"
 #include <ByteArray.h>
+#ifndef ENV_ESP32DEV
 #include "avr/pgmspace.h"
+#endif
 #include "cmdProc.h"
 
 SerialBuf sbuf;
@@ -23,13 +25,22 @@ uint32_t lng = 1000;
 uint32_t lngold = 1000;
 char text1[] = {"this is a text._____"}; // pad the text to 20 chars
 char text1old[] = {"this is an old text."};
+#ifdef ENV_ESP32DEV
+const char sw1name[]{"Switch1"};
+const char count1name[]{"Counter1"};
+const char rname[]{"Temp1"};
+const char lngname[]{"LongCounter"};
+const char text1name[]{"Text1"};
+
+#else
 const char sw1name[] PROGMEM{"Switch1"};
 const char count1name[] PROGMEM{"Counter1"};
 const char rname[] PROGMEM{"Temp1"};
 const char lngname[] PROGMEM{"LongCounter"};
 const char text1name[] PROGMEM{"Text1"};
+#endif
 
-ConfigInfo config(toDate16(2020, 11, 25), toTime16(20, 12, 00), 1, 0, deviceName);
+ConfigInfo config(5, toDate16(2020, 11, 25), toTime16(20, 12, 00), 1, 0, deviceName);
 
 void callback(PinInfo *cfi);    // forward deklaracija za callback
 void pinCallback(PinInfo *cfi); // callback za pojedinacni pin
@@ -63,7 +74,7 @@ void setup()
   digitalWrite(12, LOW);
   digitalWrite(13, LOW);
 
-  config.init(5);
+  //config.init(5);
   config.addPin(201, sw1name, &sw1, &sw1old, PinDataType::pdtBool, PinMode::pmOutput, pinCallback);
   config.addPin(202, count1name, &count1, &count1old, PinDataType::pdtInt16, PinMode::pmOutput, pinCallback);
   config.addPin(203, rname, &r, &rold, PinDataType::pdtFloat, PinMode::pmOutput, pinCallback);
@@ -361,6 +372,15 @@ int cmdSet(CmdProc::Proc *c)
       pi->setValue(s);
       return 0;
       break;
+
+    case PinDataType::pdtTime16:
+    case PinDataType::pdtDate16:
+    case PinDataType::pdtByteArray:
+      // TODO: Implement this!
+      return CMD_ERR_INVALIDVALUE;
+
+    case PinDataType::pdtUnknown:
+      return CMD_ERR_INVALIDVALUE;
     }
   }
   return CMD_ERR_GENERALERROR;
