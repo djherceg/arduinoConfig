@@ -76,12 +76,16 @@ Register state variables (Pins) with the ConfigInfo object and provide metadata 
   * Pin mode
   * Pin change callback (function pointer)
 
-	config.addPin(201, sw1name, &sw1, &sw1old, PinDataType::pdtBool, PinMode::pmOutput, pinCallback);
-	config.addPin(202, count1name, &count1, &count1old, PinDataType::pdtInt16, PinMode::pmOutput, pinCallback);
-	config.addPin(203, rname, &r, &rold, PinDataType::pdtFloat, PinMode::pmOutput, pinCallback);
-	config.addPin(204, lngname, &lng, &lngold, PinDataType::pdtUInt32, PinMode::pmOutput, pinCallback);
-	config.addPin(205, text1name, text1, text1old, PinDataType::pdtString, PinMode::pmOutput, pinCallback);
-	config.setEventHandler(callback);    // general 'onchange' handler for all pins
+	void setup()
+	{
+		config.addPin(201, sw1name, &sw1, &sw1old, PinDataType::pdtBool, PinMode::pmOutput, pinCallback);
+		config.addPin(202, count1name, &count1, &count1old, PinDataType::pdtInt16, PinMode::pmOutput, pinCallback);
+		config.addPin(203, rname, &r, &rold, PinDataType::pdtFloat, PinMode::pmOutput, pinCallback);
+		config.addPin(204, lngname, &lng, &lngold, PinDataType::pdtUInt32, PinMode::pmOutput, pinCallback);
+		config.addPin(205, text1name, text1, text1old, PinDataType::pdtString, PinMode::pmOutput, pinCallback);
+		config.setEventHandler(callback);    // general 'onchange' handler for all pins
+		// ...
+	}
 	
 ## Implement callbacks
 
