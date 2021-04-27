@@ -15,27 +15,27 @@
 class BytePacker
 {
 private:
-  uint8_t *buf;     // bafer kao niz bajtova
-  uint8_t len;      // dužina bafera u bajtovima
-  uint8_t pos;      // trenutna pozicija u baferu
+  uint8_t *buf;     // input buffer
+  uint8_t len;      // buffer length
+  uint8_t pos;      // current position in buffer
 
 public:
-  /** povezuje se na izlazni bafer zadate dužine */
+  /** Assign the output buffer of the specified length */
   void init(uint8_t *buffer, uint8_t length);
 
-  /** briše bafer */
+  /** Clears the uffer */
   void clear();
 
-  /** da li u baferu ima mesta za još n bajtova */
+  /** can the output buffer receive n bytes? */
   bool isfreen(uint8_t n);
 
-  /** trenutna dužina poruke u izlaznom baferu */
+  /** current position in the output buffer */
   uint8_t getPos();
 
-  /** Upisuje jedan bajt u izlazni bafer. Vraća false ako u baferu nema mesta. */
+  /** Writes a byte into the output buffer. Returns true on success, false if the buffer is full. */
   bool write(uint8_t b);
 
-  /** Upisuje id, pinDataType::pdtBool i b u izlazni bafer. Vraća false ako u baferu nema mesta. */
+  /** Writes id, pinDataType::pdtBool and b to the output buffer. Returns true on success, flase if the buffer is full. */
   bool putBool(uint8_t id, bool b);
 
   bool putByte(uint8_t id, uint8_t b);
@@ -48,9 +48,9 @@ public:
   bool putTime16(uint8_t id, uint8_t hour, uint8_t minute, uint8_t second);
   bool putPString(const char *src);
   
-  /** Kopira string u izlazni bafer u Pascal formatu. Vraća false ako u baferu nema mesta. TODO: proveriti! */
+  /** Copy C-style string to the output buffer in Pascal format. Returns true on success, false if the buffer is full. TODO: check the code! */
   bool putString(const char *src);
-  /** Kopira PROGMEM string u izlazni bafer u Pascal formatu. Vraća false ako u baferu nema mesta. TODO: proveriti! */
+  /** Copy C-style string from PROGMEM to the output buffer in Pascal format. Returns true on success, false if the buffer is full. TODO: check the code! */
   bool putString_P(const char *src);
 
 

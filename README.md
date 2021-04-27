@@ -109,6 +109,7 @@ Note the __FlashStringHelper cast by the name field. This is because name points
 
 Configuration commands are in binary format. They should be formed by an external application and transmitted to the ConfigMan library.
 TODO: Format documentation will be added in the future.
+
 To process incoming configuration commands, invoke the ConfigInfo::processCommand method.
 
 

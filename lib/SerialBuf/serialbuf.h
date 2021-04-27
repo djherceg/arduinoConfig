@@ -1,3 +1,11 @@
+/*
+    Serial buffer
+    Djordje Herceg, 27.4.2021.
+
+    GitHub: https://github.com/djherceg/serialBuf
+*/
+
+
 #ifndef __SERIALBUF_H
 #define __SERIALBUF_H
 
