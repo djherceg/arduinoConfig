@@ -34,7 +34,7 @@ Include the library.
 	#include <ConfigInfo.h>
 
 ## Declare state variables
-Declare state variables and provide initial values. Pin names are kept in PROGMEM to reduce RAM usage.
+Declare state variables and provide initial values. On Arduino, pin names are kept in PROGMEM to reduce RAM usage. On ESP32, pin names are kept in RAM, so PROGMEM must be omitted.
 
 	bool sw1 = false;
 	bool sw1old = false;
@@ -54,9 +54,9 @@ Declare state variables and provide initial values. Pin names are kept in PROGME
 
 ## Initialize the ConfigInfo
 
-Initialize the ConfigInfo object with the device name, manufacture date and time.
+Initialize the ConfigInfo object with the number of pins, device name, manufacture date and time.
 
-	ConfigInfo config(toDate16(2020, 11, 25), toTime16(20, 12, 00), 1, 0, deviceName);
+	ConfigInfo config(5, toDate16(2020, 11, 25), toTime16(20, 12, 00), 1, 0, deviceName);
 
 ## Declare callback functions
 
@@ -67,22 +67,21 @@ Declare callback functions which will be invoked by the library when a pin value
 
 ## Register pins
 
-Register state variables (Pins) with the ConfigInfo object and provide metadata.
+Register state variables (Pins) with the ConfigInfo object and provide metadata for each pin.
 	- Pin ID
-	- Pin name (in PROGMEM)
+	- Pin name (C string in PROGMEM for Uno, in RAM for ESP32)
 	- Pin variable for the current value
 	- Pin variable for the old value (optional)
 	- Pin data type
 	- Pin mode
 	- Pin change callback (function pointer)
 
-	  config.init(5);
 	  config.addPin(201, sw1name, &sw1, &sw1old, PinDataType::pdtBool, PinMode::pmOutput, pinCallback);
 	  config.addPin(202, count1name, &count1, &count1old, PinDataType::pdtInt16, PinMode::pmOutput, pinCallback);
 	  config.addPin(203, rname, &r, &rold, PinDataType::pdtFloat, PinMode::pmOutput, pinCallback);
 	  config.addPin(204, lngname, &lng, &lngold, PinDataType::pdtUInt32, PinMode::pmOutput, pinCallback);
 	  config.addPin(205, text1name, text1, text1old, PinDataType::pdtString, PinMode::pmOutput, pinCallback);
-	  config.setEventHandler(callback);
+	  config.setEventHandler(callback);    // general 'onchange' handler for all pins
 	
 ## Implement callbacks
 
@@ -108,7 +107,10 @@ Note the __FlashStringHelper cast by the name field. This is because name points
 
 # Processing incoming commands
 
+Configuration commands are in binary format. They should be formed by an external application and transmitted to the ConfigMan library.
+TODO: Format documentation will be added in the future.
 To process incoming configuration commands, invoke the ConfigInfo::processCommand method.
+
 
 	    switch (sbuf.buffer[0])
 	    {
