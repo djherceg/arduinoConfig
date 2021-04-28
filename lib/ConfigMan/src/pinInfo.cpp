@@ -29,6 +29,7 @@ void PinInfo::setValue(void *val)
     memcpy(this->value, val, pdtLen(this->type));
 };
 
+/** this is for strings and byte arrays */
 void PinInfo::setValue(void *val, uint8_t len)
 {
     if ((this->type != PinDataType::pdtString) && (this->type != PinDataType::pdtByteArray))

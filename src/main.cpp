@@ -74,7 +74,6 @@ void setup()
   digitalWrite(12, LOW);
   digitalWrite(13, LOW);
 
-  //config.init(5);
   config.addPin(201, sw1name, &sw1, &sw1old, PinDataType::pdtBool, PinMode::pmOutput, pinCallback);
   config.addPin(202, count1name, &count1, &count1old, PinDataType::pdtInt16, PinMode::pmOutput, pinCallback);
   config.addPin(203, rname, &r, &rold, PinDataType::pdtFloat, PinMode::pmOutput, pinCallback);
@@ -82,11 +81,11 @@ void setup()
   config.addPin(205, text1name, text1, text1old, PinDataType::pdtString, PinMode::pmOutput, pinCallback);
   config.setEventHandler(callback);
 
-  // inicijalizuj SerialBuffer
+  // initialize the SerialBuffer
   sbuf.init();
   sbuf.textMode();
 
-  // inicijalizuj komandni procesor
+  // initialize the command processor
   cmdProc.Init(6);
   cmdProc.Add(verCmd, cmdVer, 1, 1);
   cmdProc.Add(infoCmd, cmdInfo, 1, 2);
@@ -94,22 +93,6 @@ void setup()
   cmdProc.Add(setCmd, cmdSet, 3, 3);
   cmdProc.Add(startbinCmd, cmdStartbin, 1, 1);
   cmdProc.Add(resetCmd, cmdReset, 1, 1);
-
-  /*
-  buf[0] = (uint8_t)'S';
-  buf[1] = 201;
-  buf[2] = 0;
-  buf[3] = 1;
-  buf[4] = 2;
-
-  uint8_t resplen = config.processCommand(buf, 4, dest.buffer, dest.getMaxLen());
-  dest.setLen(resplen);
-  for (int i = 0; i < dest.getLen(); i++)
-  {
-    //Serial.print(dest[i], DEC);
-    //Serial.print(", ");
-  }
-  */
 }
 
 void callback(PinInfo *pin)
@@ -153,8 +136,8 @@ void loop()
       uint8_t buflen = sbuf.getLength();
       if (buflen > 2)
       {
-        uint8_t payloadLen = sbuf.buffer[1]; // drugi bajt poruke je dužina Payload-a
-        if (payloadLen + 2 == buflen)        // da li je dužina Payload-a ista kao što je najavljeno?
+        uint8_t payloadLen = sbuf.buffer[1]; // second byte is payload length
+        if (payloadLen + 2 == buflen)        // is payload length the same as advertised?
         {
           uint8_t rez = config.processCommand((uint8_t *)sbuf.buffer + 2, buflen - 2, dest.buffer, dest.getMaxLen());
           dest.setLen(rez);
@@ -190,7 +173,7 @@ void printStr_P(const char *p)
 {
   char *ptr = (char *)malloc(strlen_P(p) + 1);
   if (ptr != NULL)
-  { // if memory allocation successful
+  { // if memory allocation is successful
     strcpy_P(ptr, p);
     Serial.print(ptr); // function overload
     free(ptr);
@@ -326,7 +309,8 @@ int cmdSet(CmdProc::Proc *c)
       if (CmdProc::tryParseInt(s, i))
       {
         bool b = (bool)i;
-        pi->setValue(&b);
+        //pi->setValue(&b);
+        config.setValue(pi, &b);
         return 0;
       }
       break;
@@ -336,7 +320,8 @@ int cmdSet(CmdProc::Proc *c)
       if (CmdProc::tryParseInt(s, i, true))
       {
         uint8_t b = i;
-        pi->setValue(&b);
+        //pi->setValue(&b);
+        config.setValue(pi, &b);
         return 0;
       }
       break;
@@ -345,7 +330,8 @@ int cmdSet(CmdProc::Proc *c)
     case PinDataType::pdtUInt16:
       if (CmdProc::tryParseInt(s, i, true))
       {
-        pi->setValue(&i);
+        //pi->setValue(&i);
+        config.setValue(pi, &i);
         return 0;
       }
       break;
@@ -354,7 +340,8 @@ int cmdSet(CmdProc::Proc *c)
     case PinDataType::pdtUInt32:
       if (CmdProc::tryParseInt32(s, l, true))
       {
-        pi->setValue(&l);
+        //pi->setValue(&l);
+        config.setValue(pi, &l);
         return 0;
       }
       break;
@@ -364,20 +351,69 @@ int cmdSet(CmdProc::Proc *c)
       {
         Serial.print(F("ParseFloat returned "));
         Serial.print(f, 7);
-        pi->setValue(&f);
+        //pi->setValue(&f);
+        config.setValue(pi, &f);
         return 0;
       }
 
     case PinDataType::pdtString:
-      pi->setValue(s);
+      //pi->setValue(s, strlen(s));
+      config.setValue(pi, s, strlen(s));
       return 0;
       break;
 
     case PinDataType::pdtTime16:
+    {
+      int hour, minute, second;
+      Serial.print(F("set time:"));
+      bool ok = CmdProc::tryParseTime(s, hour, minute, second);
+      Serial.println(ok);
+      if (ok)
+      {
+        uint16_t t = toTime16(hour, minute, second);
+        config.setValue(pi, &t);
+        return 0;
+      }
+      break;
+    }
+
     case PinDataType::pdtDate16:
+    {
+      int day, month, year;
+      Serial.print(F("set date:"));
+      bool ok = CmdProc::tryParseDate(s, day, month, year);
+      Serial.println(ok);
+      if (ok)
+      {
+        uint16_t t = toDate16(day, month, year);
+        config.setValue(pi, &t);
+        return 0;
+      }
+      break;
+    }
+
     case PinDataType::pdtByteArray:
-      // TODO: Implement this!
-      return CMD_ERR_INVALIDVALUE;
+    {
+      int n = c->GetTokenCount() - 2; // remaining tokens minus 'set' and 'pinId'
+      Serial.print(F("tokens-2:"));
+      Serial.println(n);
+      uint8_t *bytes = new uint8_t(n);
+      for (int j = 0; j < n; j++)
+        if (CmdProc::tryParseInt(s, i, false))
+        {
+          Serial.print(i);
+          Serial.print(',');
+          bytes[j] = (uint8_t)i;
+          s = c->GetNextToken();
+        }
+        else
+        {
+          delete[] bytes;
+          return 0;
+        }
+      config.setValue(pi, bytes, n);
+      delete[] bytes;
+    }
 
     case PinDataType::pdtUnknown:
       return CMD_ERR_INVALIDVALUE;
